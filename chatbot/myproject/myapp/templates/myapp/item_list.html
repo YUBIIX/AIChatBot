@@ -1,0 +1,445 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'myapp/style.css' %}">
+    <title>AI ChatBot</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif; /* ฟอนต์ของเนื้อหา */
+            background-color: #f4f4f4; /* สีพื้นหลัง */
+            margin: 0; /* ขอบ */
+            padding: 20px; /* การจัดวางภายใน */
+        }
+        .textAI {
+            max-width: 600px; /* ความกว้างสูงสุด */
+            padding: 70px; /* การจัดวางภายใน */
+            border-radius: 8px; /* มุมโค้ง */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* เงา */
+            position: relative; /* การจัดตำแหน่ง */
+            left: 0; /* จัดชิดซ้าย */
+            margin-left: 0; /* ไม่มีระยะห่างทางซ้าย */
+        }
+        h1 {
+            color: #5350c4; /* สีของหัวข้อ */
+            font-size: 2.5em; /* ขนาดตัวอักษร */
+            margin-bottom: 20px; /* ระยะห่างด้านล่าง */
+        }
+        p {
+            color: #555; /* สีของข้อความ */
+            line-height: 1.6; /* ระยะห่างระหว่างบรรทัด */
+            font-size: 1.2em; /* ขนาดตัวอักษรของข้อความ */
+        }
+
+        
+         {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(#EEEEFF, #C8C7FF);
+    padding: 140px;
+}
+
+#chatbot-toggler {
+    position: fixed;
+    bottom: 30px;
+    right: 35px;
+    border: none;
+    height: 50px;
+    width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 50%;
+    background: #5350c4;
+    transition: all 0.2s ease;
+}
+
+body.show-chatbot #chatbot-toggler {
+    transform: rotate(90deg);
+}
+
+#chatbot-toggler span {
+    color: #fff;
+    position: absolute;
+}
+
+#chatbot-toggler span:last-child {
+    opacity: 0;
+}
+
+body.show-chatbot #chatbot-toggler span:first-child,
+body.show-chatbot #chatbot-toggler span:last-child {
+    opacity: 1;
+}
+
+.chatbot-popup {
+    position: fixed;
+    right: 35px;
+    bottom: 90px;
+    width: 420px;
+    height: 640px;
+    background: #fff;
+    overflow: hidden;
+    border-radius: 15px;
+    opacity: 0;
+    transform: scale(0);
+    transform-origin: bottom right;
+    pointer-events: none;
+    box-shadow: 0 0 128px 0 rgba(0, 0, 0, 0.1), 0 32px 64px -48px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s ease;
+}
+
+body.show-chatbot .chatbot-popup {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    background: #5350c4;
+    padding: 15px 22px;
+    justify-content: space-between;
+}
+
+.chat-header .header-info {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.header-info .chatbot-logo {
+    height: 35px;
+    width: 35px;
+    padding: 6px;
+    fill: #5350c4;
+    flex-shrink: 0;
+    background: #fff;
+    border-radius: 50%;
+}
+
+.header-info .logo-text {
+    color: #fff;
+    font-size: 1.31rem;
+    font-weight: 600;
+}
+
+.chat-header #close-chatbot {
+    border: none;
+    color: #fff;
+    height: 40px;
+    width: 40px;
+    font-size: 1.9rem;
+    margin-right: -10px;
+    padding-top: 2px;
+    cursor: pointer;
+    border-radius: 50%;
+    background: none;
+    transition: 0.2s ease;
+}
+
+.chat-header #close-chatbot:hover {
+    background: #3d39ac;
+}
+
+.chat-body {
+    padding: 25px 22px;
+    display: flex;
+    gap: 20px;
+    height: 400px;
+    margin-bottom: 82px;
+    overflow-y: auto;
+    flex-direction: column;
+    scrollbar-width: thin;
+    scrollbar-color: #ccccf5 transparent;
+}
+
+.chat-body .message {
+    display: flex;
+    gap: 11px;
+    align-items: center;
+}
+
+.chat-body .bot-message .bot-avatar {
+    height: 35px;
+    width: 35px;
+    padding: 0;
+    flex-shrink: 0;
+    margin-bottom: 2px;
+    align-self: flex-end;
+    background: #5350c4;
+    border-radius: 50%;
+    fill: #fff;
+}
+
+.chat-body .user-message {
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.chat-body .message .message-text {
+    padding: 12px 16px;
+    max-width: 75%;
+    font-size: 0.95rem;
+}
+
+.chat-body .bot-message.thinking .message-text {
+    padding: 2px 16px;
+}
+
+.chat-body .bot-message .message-text {
+    background: #f2f2ff;
+    border-radius: 13px 13px 13px 3px;
+}
+
+.chat-body .user-message .message-text {
+    color: #fff;
+    background: #5350c4;
+    border-radius: 13px 13px 3px 13px;
+}
+
+.chat-body .user-message .attachment {
+    width: 50%;
+    margin: #5350c4;
+    border-radius: 13px 13px 3px 13px;
+}
+
+.chat-body .bot-message .thinking-indicator {
+    display: flex;
+    gap: 4px;
+    padding-block: 15px;
+}
+
+.chat-body .bot-message .thinking-indicator .dot {
+    height: 7px;
+    width: 7px;
+    opacity: 0.7;
+    border-radius: 50%;
+    background: #6f6bc2;
+    animation: dotPulse 1.8s ease-in-out infinite;
+}
+
+.chat-body .bot-message .thinking-indicator .dot:nth-child(1) {
+    animation-delay: 0.2s;
+}
+
+.chat-body .bot-message .thinking-indicator .dot:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+.chat-body .bot-message .thinking-indicator .dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes dotPulse {
+    0%, 44% {
+        transform: translateY(0);
+    }
+    28% {
+        opacity: 0.4;
+        transform: translateY(-4px);
+    }
+    44% {
+        opacity: 0.2;
+    }
+}
+
+.chat-footer { 
+    position: relative;
+    bottom: 70px;       /* ขยับขึ้นจากด้านล่าง 10px */
+    left: 5px;          /* ขยับไปทางซ้าย 5px */
+    width: 100%;
+    background: #fff;
+    padding: 15px 22px;
+    border-top: 1px solid #ccc;
+}
+
+
+.chat-footer .chat-form {
+    display: flex;
+    position: relative;
+    align-items: center;
+    background: #fff;
+    border-radius: 32px;
+    outline: 1px solid #c3c3c5;
+    width: 380px;
+}
+
+.chat-footer .chat-form:focus-within {
+    outline: 2px solid #5350c4;
+}
+
+.chat-form .message-input {
+    border: none;
+    outline: none;
+    height: 30px;
+    width: 100%;
+    resize: none;
+    max-height: 40px;
+    font-size: 0.95rem;
+    padding: 14px 0 13px 18px;
+    border-radius: inherit;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+
+.chat-form .message-input:hover {
+    scrollbar-color: #ccccf5 transparent;
+}
+
+.chat-form .chat-controls {
+    display: flex;
+    height: 47px;
+    gap: 3px;
+    align-items: center;
+    padding-right: 6px;
+}
+
+.chat-form .chat-controls button {
+    height: 35px;
+    width: 35px;
+    border: none;
+    font-size: 1.15rem;
+    cursor: pointer;
+    color: #706DB0;
+    background: none;
+    border-radius: 50%;
+    transition: 0.2s ease;
+}
+
+.chat-form .chat-controls #send-message {
+    color: #fff;
+    display: none;
+    background: #5350c4;
+}
+
+.chat-form .message-input:valid ~ .chat-controls #send-message {
+    display: block;
+}
+
+.chat-form .chat-controls #send-message:hover {
+    background: #5350c4;
+}
+
+.chat-form .chat-controls button:hover {
+    background: #f1f1ff;
+}
+
+.chat-form .file-upload-wrapper {
+    height: 35px;
+    width: 35px;
+    position: relative;
+}
+
+.chat-form .file-upload-wrapper :where(img, button) {
+    position: absolute;
+}
+
+.chat-form .file-upload-wrapper img {
+    display: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.chat-form .file-upload-wrapper #file-cancel {
+    color: #ff0000;
+    background: #fff;
+}
+
+.chat-form .file-upload-wrapper :where(img, #file-cancel),
+.chat-form .file-upload-wrapper .file-uploaded #file-upload {
+    display: none;
+}
+
+.chat-form .file-upload-wrapper .file-uploaded img,
+.chat-form .file-upload-wrapper .file-uploaded:hover #file-cancel {
+    display: block;
+}
+
+em-emoji-picker {
+    position: absolute;
+    left: 50%;
+    top: -337px;
+    width: 100%;
+    max-width: 350px;
+    max-height: 330px;
+    visibility: hidden;
+    transform: translate(-50%);
+}
+
+body.show-emoji-picker em-emoji-picker {
+    visibility: visible;
+}
+
+.visitor-count {
+    position: fixed; /* ทำให้ตำแหน่งอยู่คงที่ */
+    bottom: 20px;    /* ขยับขึ้นจากขอบล่าง 20px */
+    left: 20px;      /* ขยับเข้ามาจากขอบซ้าย 20px */
+    font-size: 16px;
+    color: #333;     /* ตั้งค่าสีตัวอักษร */
+}
+
+    </style>
+
+<body>
+    <div class="textAI">
+        <h1>This Is ChatBot</h1>
+        <p>AI Chat is an AI chatbot that writes text. You can use it to write stories, messages, or programming code. You can use the AI chatbot as a virtual tutor in almost any subject.
+        </p>
+    </div>
+        <button id="chatbot-toggler">
+            <span class="material-icons">mode_comment</span>
+            <span class="material-icons">close</span>
+        </button>
+        <div class="chatbot-popup">
+            <div class="chat-header">
+                <div class="header-info">
+                    <svg class="chatbot-logo" xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 1024 1024">
+                        <path d="M738.3 287.6H285.7c-59 0-106.8 47.8-106.8 106.8v303.1c0 59 47.8 106.8 106.8 106.8h81.5v111.1c0 .7.8 1.1 1.4.7l166.9-110.6 41.8-.8h117.4l43.6-.4c59 0 106.8-47.8 106.8-106.8V394.5c0-59-47.8-106.9-106.8-106.9zM351.7 448.2c0-29.5 23.9-53.5 53.5-53.5s53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5-53.5-23.9-53.5-53.5zm157.9 267.1c-67.8 0-123.8-47.5-132.3-109h264.6c-8.6 61.5-64.5 109-132.3 109zm110-213.7c-29.5 0-53.5-23.9-53.5-53.5s23.9-53.5 53.5-53.5 53.5 23.9 53.5 53.5-23.9 53.5-53.5 53.5zM867.2 644.5V453.1h26.5c19.4 0 35.1 15.7 35.1 35.1v121.1c0 19.4-15.7 35.1-35.1 35.1h-26.5zM95.2 609.4V488.2c0-19.4 15.7-35.1 35.1-35.1h26.5v191.3h-26.5c-19.4 0-35.1-15.7-35.1-35.1zM561.5 149.6c0 23.4-15.6 43.3-36.9 49.7v44.9h-30v-44.9c-21.4-6.5-36.9-26.3-36.9-49.7 0-28.6 23.3-51.9 51.9-51.9s51.9 23.3 51.9 51.9z"></path>
+                    </svg>
+                    <h2 class="logo-text">ChatBot</h2>
+                </div>
+                <button id="close-chatbot" class="material-icons">keyboard_arrow_down</button>
+            </div>
+            <div class="chat-body">
+                <!-- Messages will be displayed here -->
+            </div>
+            <div class="chat-footer">
+                <form action="#" class="chat-form">
+                    <textarea placeholder="Message..." class="message-input"></textarea>
+                    <div class="chat-controls">
+                        <button type="button" id="emoji-picker" class="material-icons">sentiment_satisfied</button>
+                        <div class="file-upload-wrapper">
+                            <input type="file" accept="images/*" id="file-input" hidden>
+                            <img src="#" alt="File preview" id="file-preview">
+                            <button type="button" id="file-upload" class="material-icons">attach_file</button>
+                            <button type="button" id="file-cancel" class="material-icons">close</button>
+                        </div>
+                        <button type="submit" id="send-message" class="material-icons">arrow_upward</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="visitor-count">
+            <p>จำนวนผู้เข้าชม: {{ visit_count }}</p>
+            <p>Visitor ID: {{ visitorID }}</p>
+        </div>
+        <script src="{% static 'myapp/js/script.js' %}"></script>
+    </body>
+
+</html>
